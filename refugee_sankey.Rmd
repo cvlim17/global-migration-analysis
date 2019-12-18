@@ -1,0 +1,68 @@
+---
+title: "Data Viz Sankey"
+author: "Christine Lim"
+date: "December 12, 2019"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r}
+library(readxl)
+
+#the file is in  same folder
+
+#setwd("C:/Users/cvlim/Desktop/NYU Coursework/Data Visualization")
+migration <- read_xlsx("unhcr_r.xlsx", sheet="sankey_3")
+
+```
+
+```{r}
+library(networkD3)
+```
+
+```{r}
+sankey<-data.frame(source=migration$Origin, 
+                   target=migration$`Country of asylum`, 
+                   Before_value=migration$Value)
+
+#create nodes data by determining all unique nodes
+
+node_names <- unique(c(as.character(sankey$source), as.character(sankey$target)))
+nodes <- data.frame(name=node_names)
+
+#create links by matching source and target values to index of node it refers to in the nodes data frame
+
+links <-data.frame(source=match(sankey$source, node_names) -1, 
+                  target=match(sankey$target, node_names) -1,
+                  Before_value = sankey$Before_value)
+
+
+```
+
+```{r}
+
+my_color <- "d3.scaleOrdinal()
+     .domain(['Syrian Arab Rep.', 'Afghanistan', 'Venezuela', 'South Sudan', 'Dem. Rep. of the Congo', 'Iraq', 'Somalia', 'Yemen', 'Cuba', 'Turkey', 'Pakistan', 'Colombia', 'Uganda', 'Germany'])
+     .range(['#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#ffaa00', '#86bcb6', '#86bcb6', '#86bcb6', '#86bcb6', '#86bcb6']);
+  "
+
+```
+
+```{r}
+sankey_diagram <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", 
+              Target = "target", Value = "Before_value", NodeID="name",  colourScale = my_color, fontSize = 8, fontFamily = "Verdana", sinksRight = T, width=375, height=230)
+
+sankey_diagram
+
+```
+
+
+```{r}
+sankey_diagram_2 <- sankeyNetwork(Links = links, Nodes = nodes, Source = "source", 
+              Target = "target", Value = "Before_value", NodeID="name",  colourScale = my_color, fontSize = 10, fontFamily = "Verdana",  width=635, height=260)
+
+sankey_diagram_2
+
+```
+
